@@ -86,6 +86,8 @@ public class D03_ManhattanDistance {
 	}
 	
 	public static void main(String[] args) {
+		long t1 = System.currentTimeMillis();
+		long t2 = System.currentTimeMillis();
 
 		//Tests
 //		String[] routes = {"R75,D30,R83,U83,L12,D49,R71,U7,L72", "U62,R66,U55,R34,D71,R55,D58,R83"};
@@ -96,13 +98,19 @@ public class D03_ManhattanDistance {
 
 		ArrayList<WireRoute> wires = new ArrayList<WireRoute>();
 		for(String route : routes) {
+			t1 = System.currentTimeMillis();
 			WireRoute r = new WireRoute();
 			r.processDirections(route);
+			t2 = System.currentTimeMillis();
 //			System.out.println(r.route);
 			wires.add(r);
+			
+			System.out.println("Route processing: " + (t2 - t1) + "ms");
 		}
 		
 		//find collisions
+		t1 = System.currentTimeMillis();
+
 		ArrayList<Coordinate> collisions = null;
 		for(WireRoute r : wires) {
 			if(collisions == null)
@@ -112,19 +120,30 @@ public class D03_ManhattanDistance {
 		}
 		//nobody cares about the initial 0,0
 		collisions.remove(0);
-		
+		t2 = System.currentTimeMillis();
+		System.out.println("Collision processing: " + (t2 - t1) + "ms");
+
 		
 		int distance = Integer.MAX_VALUE;
 		
 		//get nearest collision
-//		for(Coordinate c : collisions) {
+		t1 = System.currentTimeMillis();
+
+		for(Coordinate c : collisions) {
 //			System.out.println(c);
-//			int d = (Math.abs(c.x) + Math.abs(c.y));
-//			if(d < distance)
-//				distance = d;
-//		}
+			int d = (Math.abs(c.x) + Math.abs(c.y));
+			if(d < distance)
+				distance = d;
+		}
+		t2 = System.currentTimeMillis();
+		System.out.println("Nearest collision processing: " + (t2 - t1) + "ms");
+		System.out.println("Nearest collision Manhattan Distance: " + distance);
 		
+		//Reset distance
+		distance = Integer.MAX_VALUE;
+
 		//get shortest collision
+		t1 = System.currentTimeMillis();
 		HashMap<Coordinate, Integer> collPoints = new HashMap<Coordinate, Integer>();
 		for(Coordinate c : collisions) {
 			int steps = 0;
@@ -136,9 +155,11 @@ public class D03_ManhattanDistance {
 				distance = steps;
 		}
 		
-		System.out.println(collPoints);
+//		System.out.println(collPoints);
 		
-		System.out.println(distance);
+		t2 = System.currentTimeMillis();
+		System.out.println("Shortest steps collision processing: " + (t2 - t1) + "ms");
+		System.out.println("Shortest steps collision Manhattan Distance: " + distance);
 	}
 
 	
