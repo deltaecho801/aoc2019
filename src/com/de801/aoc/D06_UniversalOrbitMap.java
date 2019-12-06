@@ -24,19 +24,6 @@ public class D06_UniversalOrbitMap {
 			children.add(o);
 		}
 		
-		public OrbitalNode getChildWithNode(OrbitalNode o) {
-			for(OrbitalNode c : children) {
-				if(c == o)
-					return c;
-				else {
-					OrbitalNode n = c.getChildWithNode(o);
-					if(n != null)
-						return c;
-				}
-			}
-			return null;
-		}
-		
 		public int countOrbits() {
 			if(directOrbit == null)
 				return 0;
@@ -94,27 +81,63 @@ public class D06_UniversalOrbitMap {
 		}
 	}
 	
+	public ArrayList<OrbitalNode> scanChildForRoute(OrbitalNode child, OrbitalNode dest, OrbitalNode parent) {
+		System.out.println("scanChildForRoute(" + child + ", " + dest + ", " + parent);
+
+		ArrayList<OrbitalNode> list = new ArrayList<OrbitalNode>();
+		
+		for(OrbitalNode c : child.children) {
+			if(c == dest) {
+				list.add(c);
+				return list;
+			} else if(c != parent) {
+				ArrayList<OrbitalNode> n = scanChildForRoute(c, dest, null);
+				if(n != null) {
+					list.add(c);
+					list.addAll(n);
+					return list;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	public ArrayList<OrbitalNode> findRoute(OrbitalNode target, OrbitalNode dest) {
+		System.out.println("findRoute(" + target + ", " + dest);
+		ArrayList<OrbitalNode> list = new ArrayList<OrbitalNode>();
+		list.add(target);
+		
+		if(target == dest) {
+			return list;
+		} else if(target.directOrbit == dest) {
+			list.add(target.directOrbit);
+			return list;
+		} else {
+			ArrayList<OrbitalNode> childRoute = scanChildForRoute(target.directOrbit, dest, target);
+			if(childRoute != null) {
+				list.add(target.directOrbit);
+				list.addAll(childRoute);
+				return list;
+			} else {
+				return addLists(list, findRoute(target.directOrbit, dest));
+			}
+		}
+	}
+	
+	//Oh my god all I want is to just concatenate lists
+	public ArrayList<OrbitalNode> addLists(ArrayList<OrbitalNode> l1, ArrayList<OrbitalNode> l2) {
+		l1.addAll(l2);
+		return l1;
+	}
+	
+	
 	public int stepsBetweenNodes(OrbitalNode node1, OrbitalNode node2) {
-		
-		if(node1 == node2)
-			return 0;
-		
-		OrbitalNode jump = node1.directOrbit;
-		
-		if(jump == null)
-			throw new RuntimeException("Nodes have no link");
-		
-		if(jump == node2) {
-			return 1;
-		}
-		
-		OrbitalNode scan = node1.getChildWithNode(node2);
-		if(scan != null) {
-			return 1 + stepsBetweenNodes(scan, node2);
-		}
-		
-		return 1 + stepsBetweenNodes(jump, node2);
-		
+		ArrayList<OrbitalNode> route = findRoute(node1, node2);
+		//remove the start node
+		route.remove(node1);
+		System.out.println(route);
+		return route.size();
 	}
 	
 	public int stepsBetweenNodes(String name1, String name2) {
@@ -145,6 +168,5 @@ public class D06_UniversalOrbitMap {
 		System.out.println("Total Orbits: " + totalOrbits);
 		
 		System.out.println("Steps between node orbits: " + map.stepsBetweenNodeOrbits("YOU", "SAN"));
-
 	}
 }
