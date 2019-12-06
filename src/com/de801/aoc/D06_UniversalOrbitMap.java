@@ -2,6 +2,7 @@ package com.de801.aoc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,12 +32,12 @@ public class D06_UniversalOrbitMap {
 				return 1 + directOrbit.countOrbits();
 		}
 		
-		public OrbitalNode[] getRouteHome() {
+		public ArrayList<OrbitalNode> getRouteHome() {
 			ArrayList<OrbitalNode> route = new ArrayList<OrbitalNode>();
 			route.add(this);
 			if(directOrbit != null)
-				route.addAll(Arrays.asList(directOrbit.getRouteHome()));
-			return route.toArray(new OrbitalNode[]{});
+				route.addAll(directOrbit.getRouteHome());
+			return route;
 		}
 		
 		@Override
@@ -120,7 +121,8 @@ public class D06_UniversalOrbitMap {
 				list.addAll(childRoute);
 				return list;
 			} else {
-				return addLists(list, findRoute(target.directOrbit, dest));
+				list.addAll(findRoute(target.directOrbit, dest));
+				return list;
 			}
 		}
 	}
@@ -147,7 +149,27 @@ public class D06_UniversalOrbitMap {
 	public int stepsBetweenNodeOrbits(String name1, String name2) {
 		return stepsBetweenNodes(orbitalTree.get(name1).directOrbit, orbitalTree.get(name2).directOrbit);
 	}
+	
+	public int quickStepsBetweenNodes(OrbitalNode n1, OrbitalNode n2) {
+		ArrayList<OrbitalNode> r1 = n1.getRouteHome();
+		ArrayList<OrbitalNode> r2 = n2.getRouteHome();
+		
+		ArrayList<OrbitalNode> r3 = new ArrayList<OrbitalNode>(r1);
+		
+		r3.retainAll(r2);
+		
+		return((r1.size() + r2.size() - (2 * r3.size())));
+		
+	}
 
+	public int quickStepsBetweenNodes(String name1, String name2) {
+		return quickStepsBetweenNodes(orbitalTree.get(name1), orbitalTree.get(name2));
+	}
+	
+	public int quickStepsBetweenNodeOrbits(String name1, String name2) {
+		return quickStepsBetweenNodes(orbitalTree.get(name1).directOrbit, orbitalTree.get(name2).directOrbit);
+	}
+	
 
 	public static void main(String[] args) {
 
@@ -168,5 +190,6 @@ public class D06_UniversalOrbitMap {
 		System.out.println("Total Orbits: " + totalOrbits);
 		
 		System.out.println("Steps between node orbits: " + map.stepsBetweenNodeOrbits("YOU", "SAN"));
+		System.out.println("Steps between node orbits: " + map.quickStepsBetweenNodeOrbits("YOU", "SAN"));
 	}
 }
