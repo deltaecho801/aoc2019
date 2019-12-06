@@ -151,11 +151,12 @@ public class D06_UniversalOrbitMap {
 	}
 	
 	public int quickStepsBetweenNodes(OrbitalNode n1, OrbitalNode n2) {
+		//Get the steps from home to selected nodes
 		ArrayList<OrbitalNode> r1 = n1.getRouteHome();
 		ArrayList<OrbitalNode> r2 = n2.getRouteHome();
 		
+		//Find the common nodes
 		ArrayList<OrbitalNode> r3 = new ArrayList<OrbitalNode>(r1);
-		
 		r3.retainAll(r2);
 		
 		return((r1.size() + r2.size() - (2 * r3.size())));
